@@ -24,7 +24,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> moveToNextScreen() async {
     await Future.delayed(const Duration(milliseconds: 1500));
-    SupabaseInitializer().initialize();
+    await SupabaseInitializer().initialize();
     Get.off(AdminTeacherSelectorScreen());
   }
 
