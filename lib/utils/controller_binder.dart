@@ -7,7 +7,7 @@ class ControllerBinder extends Bindings {
   void dependencies() {
     Get.put(GetMaterialController());
     Get.put(StudentListController(), permanent: true);
-    Get.lazyPut(() => LabTeacherSelectionController());
+    Get.put(LabTeacherSelectionController(), permanent: true);
 
 
   }

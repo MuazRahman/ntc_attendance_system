@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:ntc_sas/attendance/controller/attendance_list_controller.dart';
-import 'package:ntc_sas/common/show_snack_bar_message.dart';
+import 'package:ntc_sas/common/widgets/show_snack_bar_message.dart';
 import 'package:ntc_sas/lab_teacher_selection/widgets/day_selector.dart';
 import 'package:ntc_sas/student_list/controller/student_list_controller.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';

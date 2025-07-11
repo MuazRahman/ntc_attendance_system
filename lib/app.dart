@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ntc_sas/lab_teacher_selection/lab_teacher_selection_screen.dart';
 import 'package:ntc_sas/splash_screen.dart';
 import 'package:ntc_sas/utils/controller_binder.dart';
 
@@ -24,7 +23,7 @@ class NtcSas extends StatelessWidget {
         ),
       ),
       debugShowCheckedModeBanner: false,
-      home: SplashScreen(),
+      home: const SplashScreen(),
     );
   }
 }

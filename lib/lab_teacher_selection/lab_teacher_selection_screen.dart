@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ntc_sas/attendance/attendance_screen.dart';
-import 'package:ntc_sas/common/show_snack_bar_message.dart';
+import 'package:ntc_sas/common/widgets/show_snack_bar_message.dart';
 import 'controller/lab_teacher_selection_controller.dart';
 
 class LabTeacherSelectionScreen extends StatefulWidget {
