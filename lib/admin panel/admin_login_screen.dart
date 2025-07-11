@@ -5,8 +5,6 @@ class AdminLoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final titleMedium = Theme.of(context).textTheme.titleMedium;
-    final titleSmall = Theme.of(context).textTheme.titleSmall;
     final usernameController = TextEditingController();
     final passwordController = TextEditingController();
 

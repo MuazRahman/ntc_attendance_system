@@ -14,7 +14,7 @@ class StudentListScreen extends StatefulWidget {
 
 
 class _StudentListScreenState extends State<StudentListScreen> {
-  List<bool> _isPresentList = [false, false,false, false, false];
+  final List<bool> _isPresentList = [false, false,false, false, false];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
