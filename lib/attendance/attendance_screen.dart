@@ -5,7 +5,6 @@ import 'package:ntc_sas/attendance/controller/attendance_list_controller.dart';
 import 'package:ntc_sas/common/widgets/show_snack_bar_message.dart';
 import 'package:ntc_sas/lab_teacher_selection/widgets/day_selector.dart';
 import 'package:ntc_sas/student_list/controller/student_list_controller.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AttendanceScreen extends StatefulWidget {
   final String labNo;
@@ -30,7 +29,7 @@ class AttendanceScreen extends StatefulWidget {
 class _AttendanceScreenState extends State<AttendanceScreen> {
   final StudentListController _studentListController = Get.find<StudentListController>();
   final List<Map<String, dynamic>> attendanceList = [];
-  AttendanceListController attendanceListController = AttendanceListController();
+  final AttendanceListController _attendanceListController = Get.find<AttendanceListController>();
 
   @override
   void initState() {
@@ -40,6 +39,13 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       classTime: widget.classTime,
       classDay: widget.classDay,
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _studentListController.dispose();
+    attendanceList.clear();
   }
 
 
@@ -241,17 +247,15 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
               onPressed: () async {
                 if (attendanceList.isEmpty) {
                   showSnackBarMessage(
-                    context,
                     subtitle: 'No attendance data is selected!',
                     isErrorMessage: true,
                   );
                   return;
                 }
 
-                if (attendanceListController.isAlreadySubmitted) {
+                if (_attendanceListController.isAlreadySubmitted) {
                   showSnackBarMessage(
-                    context,
-                    subtitle: 'Already submitted',
+                    subtitle: 'Already submitted!',
                     isErrorMessage: true,
                   );
                   return;
@@ -260,14 +264,13 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                 // 👉 Store the count BEFORE submit
                 final submittedCount = attendanceList.length;
 
-                await attendanceListController.submitAttendanceList(
+                await _attendanceListController.submitAttendanceList(
                   attendanceList,
                   _studentListController,
                 );
 
-                if (attendanceListController.isSuccess) {
+                if (_attendanceListController.isSuccess) {
                   showSnackBarMessage(
-                    context,
                     title: '$submittedCount',
                     subtitle: ' Attendance submitted successfully!',
                     isErrorMessage: false,

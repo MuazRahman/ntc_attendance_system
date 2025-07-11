@@ -24,22 +24,27 @@ class _LabTeacherSelectionScreenState extends State<LabTeacherSelectionScreen> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+    labTeacherSelectionController.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final titleMedium = Theme.of(context).textTheme.titleMedium;
     final titleSmall = Theme.of(context).textTheme.titleSmall;
 
     return Scaffold(
       backgroundColor: Colors.grey.shade300,
-      appBar: AppBar(backgroundColor: Colors.transparent),
       body: Center(
         child: Column(
           children: [
-            const SizedBox(height: 32),
+            const SizedBox(height: 164),
             const Text(
               'Select Attendance Info',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 128),
+            const SizedBox(height: 64),
             Column(
               children: [
                 _buildLabCard(titleMedium, titleSmall),
@@ -223,7 +228,7 @@ class _LabTeacherSelectionScreenState extends State<LabTeacherSelectionScreen> {
 
   void _showStudentList(BuildContext context) {
     if (!labTeacherSelectionController.isValid) {
-      showSnackBarMessage(context, subtitle: 'Please complete all fields', isErrorMessage: true);
+      showSnackBarMessage(subtitle: 'Please complete all fields', isErrorMessage: true);
       return;
     }
 
