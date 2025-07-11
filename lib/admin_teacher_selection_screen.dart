@@ -68,7 +68,7 @@ class AdminTeacherSelectorScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 20),
                       _ModernLoginButton(
-                        text: 'Teacher Login',
+                        text: 'Take Attendance',
                         icon: Icons.person_outline,
                         gradient: LinearGradient(
                           colors: [

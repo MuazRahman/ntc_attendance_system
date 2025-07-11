@@ -54,39 +54,44 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     return Scaffold(
       backgroundColor: Colors.grey.shade300,
       appBar: buildAppBar(),
-      body: GetBuilder<StudentListController>(
-        builder: (controller) {
-          if (controller.inProgress) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      body: Center(
+        child: SizedBox(
+          width: 600,
+          child: GetBuilder<StudentListController>(
+            builder: (controller) {
+              if (controller.inProgress) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-          if (controller.studentList.isEmpty) {
-            return const Center(child: Text('No students found.'));
-          }
+              if (controller.studentList.isEmpty) {
+                return const Center(child: Text('No students found.'));
+              }
 
-          return RefreshIndicator(
-            onRefresh: () => controller.getStudentList(
-              labNo: widget.labNo,
-              classTime: widget.classTime,
-              classDay: widget.classDay,
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                children: [
-                  // teacherName, LabNo, ClassTime shows here
-                  _buildHeader(),
-                  const SizedBox(height: 8),
-                  // No, Roll & Name, Attendance
-                  _buildTableHeader(),
-                  const Divider(thickness: 0.5, color: Colors.black),
-                  // Student List
-                  buildStudentList(controller),
-                ],
-              ),
-            ),
-          );
-        },
+              return RefreshIndicator(
+                onRefresh: () => controller.getStudentList(
+                  labNo: widget.labNo,
+                  classTime: widget.classTime,
+                  classDay: widget.classDay,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    children: [
+                      // teacherName, LabNo, ClassTime shows here
+                      _buildHeader(),
+                      const SizedBox(height: 8),
+                      // No, Roll & Name, Attendance
+                      _buildTableHeader(),
+                      const Divider(thickness: 0.5, color: Colors.black),
+                      // Student List
+                      buildStudentList(controller),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
       ),
       bottomNavigationBar: _buildBottomButtons(),
     );
@@ -94,6 +99,8 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
   PreferredSizeWidget buildAppBar() {
     return AppBar(
+      centerTitle: true,
+      automaticallyImplyLeading: false,
       backgroundColor: Colors.transparent,
       title: const Center(
         child: Text(
@@ -230,7 +237,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   Widget _buildBottomButtons() {
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 32.0),
+        padding: const EdgeInsets.all(32.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
