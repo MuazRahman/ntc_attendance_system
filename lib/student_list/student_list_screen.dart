@@ -1,5 +1,5 @@
 
-// TODO: Has not used yet. In future it will use in admin palen to see the student list
+// TODO: This dart file has not used yet. In future it will use in admin palen to see the student list
 
 
 import 'package:flutter/material.dart';

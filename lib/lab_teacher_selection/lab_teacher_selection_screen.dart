@@ -24,12 +24,6 @@ class _LabTeacherSelectionScreenState extends State<LabTeacherSelectionScreen> {
   }
 
   @override
-  void dispose() {
-    super.dispose();
-    labTeacherSelectionController.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final titleMedium = Theme.of(context).textTheme.titleMedium;
     final titleSmall = Theme.of(context).textTheme.titleSmall;

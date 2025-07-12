@@ -1,4 +1,4 @@
-class TimeSlotUtils {
+class AutoSelectClassTIme {
   static String? autoSelectTimeSlot({required bool isTest}) {
     String? selectedTimeSlot;
     final currentHour = DateTime.now().hour;

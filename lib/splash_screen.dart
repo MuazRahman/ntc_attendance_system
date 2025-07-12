@@ -35,7 +35,7 @@ class _SplashScreenState extends State<SplashScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Image.asset(AssetsPath.logoPng,),
+                Image.asset(AssetsPath.ntcLogoPng,),
               ],
             ),
           ),
