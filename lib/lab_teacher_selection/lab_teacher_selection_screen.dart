@@ -30,50 +30,52 @@ class _LabTeacherSelectionScreenState extends State<LabTeacherSelectionScreen> {
 
     return Scaffold(
       backgroundColor: Colors.grey.shade300,
-      body: Center(
-        child: Column(
-          children: [
-            const SizedBox(height: 164),
-            const Text(
-              'Select Attendance Info',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 64),
-            Column(
-              children: [
-                _buildLabCard(titleMedium, titleSmall),
-                const SizedBox(height: 24),
-                _buildTeacherCard(titleMedium, titleSmall),
-              ],
-            ),
-            const SizedBox(height: 64),
-            SizedBox(
-              height: 44,
-              width: 256,
-              child: Obx(() => ElevatedButton(
-                onPressed: labTeacherSelectionController.isValid
-                    ? () => _showStudentList(context)
-                    : null,
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            children: [
+              const SizedBox(height: 164),
+              const Text(
+                'Select Attendance Info',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 64),
+              Column(
+                children: [
+                  _buildLabCard(titleMedium, titleSmall),
+                  const SizedBox(height: 24),
+                  _buildTeacherCard(titleMedium, titleSmall),
+                ],
+              ),
+              const SizedBox(height: 64),
+              SizedBox(
+                height: 44,
+                width: 256,
+                child: Obx(() => ElevatedButton(
+                  onPressed: labTeacherSelectionController.isValid
+                      ? () => _showStudentList(context)
+                      : null,
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    backgroundColor: labTeacherSelectionController.isValid
+                        ? Colors.green
+                        : Colors.blueGrey.shade200,
                   ),
-                  backgroundColor: labTeacherSelectionController.isValid
-                      ? Colors.green
-                      : Colors.blueGrey.shade200,
-                ),
-                child: const Text(
-                  'Show Student List',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold),
-                ),
-              )),
-            ),
-            const SizedBox(height: 28),
-            const Text('Please select lab & class time carefully!'),
-          ],
+                  child: const Text(
+                    'Show Student List',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold),
+                  ),
+                )),
+              ),
+              const SizedBox(height: 28),
+              const Text('Please select lab & class time carefully!'),
+            ],
+          ),
         ),
       ),
     );

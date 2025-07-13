@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:ntc_sas/admin%20panel/admin_panel_screen.dart';
 import 'package:ntc_sas/splash_screen.dart';
 import 'package:ntc_sas/utils/controller_binder.dart';
 
@@ -11,6 +12,7 @@ class NtcSas extends StatelessWidget {
     return GetMaterialApp(
       initialBinding: ControllerBinder(),
       theme: ThemeData(
+        scaffoldBackgroundColor: Colors.grey.shade300,
         textTheme: TextTheme(
           titleMedium: TextStyle(
             fontSize: 17,
@@ -23,7 +25,8 @@ class NtcSas extends StatelessWidget {
         ),
       ),
       debugShowCheckedModeBanner: false,
-      home: const SplashScreen(),
+      // home: const SplashScreen(),
+      home: const AdminPanelScreen(),
     );
   }
 }
