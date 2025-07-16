@@ -2,7 +2,7 @@ import 'dart:ui'; // ✅ Needed for ImageFilter.blur
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ntc_sas/lab_teacher_selection/lab_teacher_selection_screen.dart';
-import 'admin panel/admin_login_screen.dart';
+import 'admin_panel/admin_login_screen.dart';
 
 class AdminTeacherSelectorScreen extends StatelessWidget {
   const AdminTeacherSelectorScreen({super.key});

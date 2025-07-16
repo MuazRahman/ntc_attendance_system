@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ntc_sas/admin%20panel/admin_panel_screen.dart';
+import 'admin_panel_screen.dart';
 import 'package:ntc_sas/common/widgets/show_snack_bar_message.dart';
 
 class AdminLoginScreen extends StatefulWidget {
