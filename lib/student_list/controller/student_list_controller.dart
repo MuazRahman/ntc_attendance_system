@@ -23,6 +23,7 @@ class StudentListController extends GetxController {
         .eq('class_time', classTime)
         .eq('class_day', classDay)
         .order('student_roll', ascending: true);
+    print(response);
 
     for (var i in response as List) {
       final data = Student.fromJson(i);

@@ -84,7 +84,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
                           // TODO: Move to admin panel;
-                          Get.off(AdminPanelScreen());
+                          Get.off(() =>  AdminPanelScreen());
                         }
                         else if (_usernameController.text.isEmpty || _passwordController.text.isEmpty) {
 
@@ -106,7 +106,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                     ),
                     const SizedBox(height: 20),
                     Center(
-                        child: Text("Login is required only for admins, Teachers don’t need to Login!", textAlign: TextAlign.center, style: TextStyle(color: Colors.grey),),
+                        child: Text("Login is required only for admins, Teachers don’t need to Login!", textAlign: TextAlign.center, style: TextStyle(color: Colors.grey, fontWeight: FontWeight.normal),),
                     ),
                   ],
                 ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'admin_panel/admin_panel_screen.dart';
+import 'package:ntc_sas/splash_screen.dart';
 import 'package:ntc_sas/utils/controller_binder.dart';
 
 class NtcSas extends StatelessWidget {
@@ -24,8 +24,7 @@ class NtcSas extends StatelessWidget {
         ),
       ),
       debugShowCheckedModeBanner: false,
-      // home: const SplashScreen(),
-      home: const AdminPanelScreen(),
+      home: const SplashScreen(),
     );
   }
 }

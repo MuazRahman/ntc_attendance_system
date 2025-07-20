@@ -13,4 +13,5 @@ class AdminPanelController extends GetxController {
   final RxnString selectedClassDay = RxnString();
   final RxnString selectedLabNo = RxnString();
   final RxnString selectedClassTime = RxnString();
+
 }
