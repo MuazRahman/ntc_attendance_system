@@ -20,8 +20,19 @@ class AdminPanelScreen extends StatefulWidget {
 
 class _AdminPanelScreenState extends State<AdminPanelScreen> {
 
-  final AdminPanelController adminPanelController = Get.find<AdminPanelController>();
+  final AdminPanelController showStudentListInAdminController = Get.find<AdminPanelController>(tag: 'showStudentsInAdmin');
+  final AdminPanelController moveStudentRoutineController = Get.find<AdminPanelController>(tag: 'moveStudentInAdmin');
   final StudentListController studentListController = Get.find<StudentListController>();
+  List<Map<String, dynamic>> selectedStudents = [];
+
+  @override
+  void initState() {
+    super.initState();
+    showStudentListInAdminController.selectedLabNo.value = null;
+    showStudentListInAdminController.selectedClassTime.value = null;
+    showStudentListInAdminController.selectedClassDay.value = null;
+    studentListController.studentList.clear();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,14 +59,12 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // const SizedBox(height: 32),
             const Center(
               child: Text(
                 'Admin Dashboard',
                 style: TextStyle(fontSize: 32, fontWeight: FontWeight.w600),
               ),
             ),
-            const SizedBox(height: 4),
             // Day, lab, time selection
             Center(
               child: Card(
@@ -66,7 +75,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                       width: cardWidth,
                       // card content padding.
                       child: Padding(
-                        padding: const EdgeInsets.all(32),
+                        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                         child: Column(
                           children: [
                             Wrap(
@@ -75,16 +84,16 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                               alignment: WrapAlignment.spaceAround,
                               children: [
                                 // ✅ Class Day
-                                buildClassDaySelector(adminPanelController),
+                                buildClassDaySelector(showStudentListInAdminController),
 
                                 // ✅ Lab Number
-                                buildLabNoSelector(adminPanelController),
+                                buildLabNoSelector(showStudentListInAdminController),
 
                                 // ✅ Class Time
-                                buildClassTimeSelector(adminPanelController),
+                                buildClassTimeSelector(showStudentListInAdminController),
                               ],
                             ),
-                            const SizedBox(height: 24,),
+                            const SizedBox(height: 8,),
 
                             Wrap(
                               spacing: 32,
@@ -110,15 +119,10 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                                 ElevatedButton(
                                   onPressed: () async{
                                     // TODO: Show student list functionality
-                                    //  await studentListController.getStudentList(
-                                    //     labNo: adminPanelController.selectedLabNo.toString(),
-                                    //     classTime: adminPanelController.selectedClassTime.toString(),
-                                    //     classDay: adminPanelController.selectedClassDay.toString(),
-                                    // );
                                     await studentListController.getStudentList(
-                                        labNo: adminPanelController.selectedLabNo.toString(),
-                                        classTime: adminPanelController.selectedClassTime.toString(),
-                                        classDay: adminPanelController.selectedClassDay.toString());
+                                        labNo: showStudentListInAdminController.selectedLabNo.toString(),
+                                        classTime: showStudentListInAdminController.selectedClassTime.toString(),
+                                        classDay: showStudentListInAdminController.selectedClassDay.toString());
                                      setState(() {});
                                   },
                                   style: ElevatedButton.styleFrom(
@@ -140,7 +144,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                                     shape: RoundedRectangleBorder
                                       (borderRadius: BorderRadius.circular(12,),),
                                     fixedSize: Size(256, 40),
-                                    backgroundColor: Colors.red.shade500,
+                                    backgroundColor: Colors.blue,
                                   ),
                                   child: Text(
                                     'Add CSV file', style: Theme.of(context).textTheme.titleMedium!.copyWith(fontSize: 18, fontWeight: FontWeight.w600,),),
@@ -160,6 +164,55 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
 
             // Show student list
             buildShowStudentList(cardWidth),
+            Center(
+              child: Card(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return SizedBox(
+                      width: cardWidth,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 4),
+                        child: Wrap(
+                          spacing: 32,
+                          runSpacing: 32,
+                          alignment: WrapAlignment.spaceAround,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            Text('Move to: '),
+                            buildClassDaySelector(moveStudentRoutineController),
+                            buildLabNoSelector(moveStudentRoutineController),
+                            buildClassTimeSelector(moveStudentRoutineController),
+                            Column(
+                              spacing: 8,
+                              children: [
+                                TextButton(
+                                    style: ButtonStyle(
+                                      backgroundColor: WidgetStatePropertyAll(Colors.green),
+                                      shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
+                                      fixedSize: WidgetStatePropertyAll(Size(72, 8))
+                                    ),
+                                    onPressed: () {},
+                                    child: Text('Move', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white),),
+                                ),
+                                TextButton(
+                                  style: ButtonStyle(
+                                      backgroundColor: WidgetStatePropertyAll(Colors.red),
+                                      shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
+                                      fixedSize: WidgetStatePropertyAll(Size(72, 8))
+                                  ),
+                                  onPressed: () {},
+                                  child: Text('Delete', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white),),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            )
           ],
         ),
       ),
@@ -178,7 +231,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                 return SizedBox(
                   width: cardWidth,
                   child: Padding(
-                    padding: const EdgeInsets.all(32),
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 8),
                     child: Column(
                       children: [
                         // student list header
@@ -191,7 +244,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                                 color: Colors.grey.shade300,
                               ),
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                 child: Text('Enrolled Student',
                                   style: TextStyle(fontSize: 18,
                                     fontWeight: FontWeight.w600,),
@@ -204,7 +257,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                                 color: Colors.grey.shade300,
                               ),
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                 child: Text('${studentListController.studentList.length} Students',
                                   style: TextStyle(fontSize: 18,
                                     fontWeight: FontWeight.w600,),
@@ -219,12 +272,32 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                             physics: const NeverScrollableScrollPhysics(),
                             itemCount: studentListController.studentList.length,
                             itemBuilder: (context, index) {
+                             final isSelected = studentListController.isPresentList[index];
                               return ListTile(
                                 leading: Text('${index+1}. ', style: TextStyle(fontSize: 16),),
-                                title: Text('${studentListController.studentList[index]['student_roll']}'),
-                                subtitle: Text('${studentListController.studentList[index]['student_name']}'),
+                                title: Text('${studentListController.studentList[index]['student_roll']} - ${studentListController.studentList[index]['student_name']}'),
+                                trailing: IconButton(
+                                    onPressed: () {
+                                      studentListController.isPresentList[index] = !isSelected;
+                                      selectedStudents.removeWhere(
+                                              (e) =>
+                                              e['student_roll'] == studentListController.studentList[index]['student_roll']);
+                                      if(studentListController.isPresentList[index]) {
+                                        selectedStudents.add({
+                                          'student_roll' : studentListController.studentList[index]['student_roll']
+                                        });
+                                      }
+
+                                      print(selectedStudents);
+                                      setState(() {});
+                                    },
+                                    icon: Icon(
+                                      isSelected ? Icons.check_box : Icons.check_box_outline_blank,
+                                      color: isSelected ? Colors.green : null,
+                                    ),
+                                ),
                               );
-                            }
+                            },
                         ),
                       ],
                     ),

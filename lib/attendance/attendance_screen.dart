@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:ntc_sas/admin_teacher_selection_screen.dart';
 import 'package:ntc_sas/attendance/controller/attendance_list_controller.dart';
 import 'package:ntc_sas/common/widgets/show_snack_bar_message.dart';
 import 'package:ntc_sas/common/widgets/auto_select_class_day.dart';
@@ -101,6 +102,12 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       centerTitle: true,
       automaticallyImplyLeading: false,
       backgroundColor: Colors.transparent,
+      leading: IconButton(
+        onPressed: () {
+          Get.offAll(() => AdminTeacherSelectorScreen());
+        },
+        icon: Icon(Icons.arrow_back_ios_new_outlined,),
+      ),
       title: const Center(
         child: Text(
           'NTC Attendance System',

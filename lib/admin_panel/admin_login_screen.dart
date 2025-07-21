@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:ntc_sas/admin_teacher_selection_screen.dart';
 import 'admin_panel_screen.dart';
 import 'package:ntc_sas/common/widgets/show_snack_bar_message.dart';
 
@@ -27,6 +28,17 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
 
     return Scaffold(
       backgroundColor: Colors.grey.shade300,
+      appBar: AppBar(
+        centerTitle: true,
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.transparent,
+        leading: IconButton(
+          onPressed: () {
+            Get.offAll(() => AdminTeacherSelectorScreen());
+          },
+          icon: Icon(Icons.arrow_back_ios_new_outlined,),
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(32.0),
         child: SingleChildScrollView(

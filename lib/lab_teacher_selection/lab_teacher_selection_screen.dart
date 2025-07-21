@@ -30,6 +30,17 @@ class _LabTeacherSelectionScreenState extends State<LabTeacherSelectionScreen> {
 
     return Scaffold(
       backgroundColor: Colors.grey.shade300,
+      appBar: AppBar(
+        centerTitle: true,
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.transparent,
+        leading: IconButton(
+          onPressed: () {
+            Get.back();
+          },
+          icon: Icon(Icons.arrow_back_ios_new_outlined,),
+        ),
+      ),
       body: SingleChildScrollView(
         child: Center(
           child: Column(
@@ -111,13 +122,12 @@ class _LabTeacherSelectionScreenState extends State<LabTeacherSelectionScreen> {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Colors.deepPurpleAccent.shade400,
-                Colors.purpleAccent.shade200,
+                Color(0xFFC2185B), // Dark Pink (Crimson-like)
+                Color(0xFF4A148C), // Deep Purple
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
-            backgroundBlendMode: BlendMode.difference,
             borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(32),
               topRight: Radius.circular(8),
@@ -182,11 +192,13 @@ class _LabTeacherSelectionScreenState extends State<LabTeacherSelectionScreen> {
         child: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Color(0xFF00C853), Color(0xFFB2FF59)],
+              colors: [
+                Color(0xFF4A148C), // Deep Purple
+                Color(0xFFC2185B), // Dark Pink (Crimson-like)
+              ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
-            backgroundBlendMode: BlendMode.difference,
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(32),
               topRight: Radius.circular(8),

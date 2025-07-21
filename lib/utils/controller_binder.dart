@@ -11,7 +11,8 @@ class ControllerBinder extends Bindings {
     Get.put(StudentListController(), permanent: true);
     Get.put(LabTeacherSelectionController(), permanent: true);
     Get.put(AttendanceListController());
-    Get.put(AdminPanelController());
+    Get.put(AdminPanelController(), tag: 'showStudentsInAdmin');
+    Get.put(AdminPanelController(), tag: 'moveStudentInAdmin');
 
 
   }
