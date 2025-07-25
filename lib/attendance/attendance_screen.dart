@@ -46,6 +46,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   void dispose() {
     attendanceList.clear();
     super.dispose();
+    _attendanceListController.isAlreadySubmitted = false;
   }
 
 
