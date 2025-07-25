@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:ntc_sas/admin_panel/add_csv_file_screen.dart';
 import 'package:ntc_sas/admin_panel/add_single_student_screen.dart';
 import 'package:ntc_sas/student_list/controller/student_list_controller.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'controller/admin_panel_controller.dart';
 
 class AdminPanelScreen extends StatefulWidget {
@@ -32,6 +33,10 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
     showStudentListInAdminController.selectedClassTime.value = null;
     showStudentListInAdminController.selectedClassDay.value = null;
     studentListController.studentList.clear();
+    moveStudentRoutineController.selectedLabNo.value = null;
+    moveStudentRoutineController.selectedClassTime.value = null;
+    moveStudentRoutineController.selectedClassDay.value = null;
+    selectedStudents.clear();
   }
 
   @override
@@ -45,6 +50,12 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        title: Center(
+          child: Text(
+            'Admin Dashboard',
+            style: TextStyle(fontSize: 28, fontWeight: FontWeight.w600),
+          ),
+        ),
         backgroundColor: Colors.grey.shade300,
         leading: IconButton(
           onPressed: () {
@@ -59,12 +70,6 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Center(
-              child: Text(
-                'Admin Dashboard',
-                style: TextStyle(fontSize: 32, fontWeight: FontWeight.w600),
-              ),
-            ),
             // Day, lab, time selection
             Center(
               child: Card(
@@ -119,6 +124,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                                 ElevatedButton(
                                   onPressed: () async{
                                     // TODO: Show student list functionality
+                                    selectedStudents.clear();
                                     await studentListController.getStudentList(
                                         labNo: showStudentListInAdminController.selectedLabNo.toString(),
                                         classTime: showStudentListInAdminController.selectedClassTime.toString(),
@@ -164,56 +170,93 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
 
             // Show student list
             buildShowStudentList(cardWidth),
-            Center(
-              child: Card(
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    return SizedBox(
-                      width: cardWidth,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 4),
-                        child: Wrap(
-                          spacing: 32,
-                          runSpacing: 32,
-                          alignment: WrapAlignment.spaceAround,
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          children: [
-                            Text('Move to: '),
-                            buildClassDaySelector(moveStudentRoutineController),
-                            buildLabNoSelector(moveStudentRoutineController),
-                            buildClassTimeSelector(moveStudentRoutineController),
-                            Column(
-                              spacing: 8,
-                              children: [
-                                TextButton(
-                                    style: ButtonStyle(
-                                      backgroundColor: WidgetStatePropertyAll(Colors.green),
-                                      shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
-                                      fixedSize: WidgetStatePropertyAll(Size(72, 8))
-                                    ),
-                                    onPressed: () {},
-                                    child: Text('Move', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white),),
-                                ),
-                                TextButton(
-                                  style: ButtonStyle(
-                                      backgroundColor: WidgetStatePropertyAll(Colors.red),
-                                      shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
-                                      fixedSize: WidgetStatePropertyAll(Size(72, 8))
-                                  ),
-                                  onPressed: () {},
-                                  child: Text('Delete', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white),),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            )
           ],
+        ),
+      ),
+
+      // change student class day, lab, time or delete student from student list.
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 32),
+        child: Card(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SizedBox(
+                width: cardWidth,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 4),
+                  child: Wrap(
+                    spacing: 32,
+                    runSpacing: 32,
+                    alignment: WrapAlignment.spaceAround,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      Text('Move to:', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),),
+                      buildClassDaySelector(moveStudentRoutineController),
+                      buildLabNoSelector(moveStudentRoutineController),
+                      buildClassTimeSelector(moveStudentRoutineController),
+                      Column(
+                        spacing: 8,
+                        children: [
+                          // move student
+                          TextButton(
+                            style: ButtonStyle(
+                                backgroundColor: WidgetStatePropertyAll(Colors.green),
+                                shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
+                                fixedSize: WidgetStatePropertyAll(Size(72, 8))
+                            ),
+                            onPressed: () async{
+                              final updatedData = {
+                                'class_day' : moveStudentRoutineController.selectedClassDay.toString(),
+                                'class_room' : moveStudentRoutineController.selectedLabNo.toString(),
+                                'class_time' : moveStudentRoutineController.selectedClassTime.toString(),
+                              };
+
+                              for(int i = 0; i<selectedStudents.length; i++) {
+                                await Supabase.instance.client.from('student').update(updatedData).eq('student_roll', selectedStudents[i]['student_roll']);
+                              }
+
+                              selectedStudents.clear();
+
+                              await studentListController.getStudentList(
+                                labNo: showStudentListInAdminController.selectedLabNo.toString(),
+                                classTime: showStudentListInAdminController.selectedClassTime.toString(),
+                                classDay: showStudentListInAdminController.selectedClassDay.toString(),
+                              );
+                              setState(() {});
+                            },
+                            child: Text('Move', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white),),
+                          ),
+                          // delete student
+                          TextButton(
+                            style: ButtonStyle(
+                                backgroundColor: WidgetStatePropertyAll(Colors.red),
+                                shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
+                                fixedSize: WidgetStatePropertyAll(Size(72, 8))
+                            ),
+                            onPressed: () async {
+                              for(int i = 0; i<selectedStudents.length; i++) {
+                                await Supabase.instance.client.from('student').delete().eq('student_roll', selectedStudents[i]['student_roll']);
+                              }
+
+                              selectedStudents.clear();
+
+                              await studentListController.getStudentList(
+                                labNo: showStudentListInAdminController.selectedLabNo.toString(),
+                                classTime: showStudentListInAdminController.selectedClassTime.toString(),
+                                classDay: showStudentListInAdminController.selectedClassDay.toString(),
+                              );
+                              setState(() {});
+                            },
+                            child: Text('Delete', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white),),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
         ),
       ),
     );
@@ -246,7 +289,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                 child: Text('Enrolled Student',
-                                  style: TextStyle(fontSize: 18,
+                                  style: TextStyle(fontSize: 16,
                                     fontWeight: FontWeight.w600,),
                                 ),
                               ),
@@ -259,7 +302,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                 child: Text('${studentListController.studentList.length} Students',
-                                  style: TextStyle(fontSize: 18,
+                                  style: TextStyle(fontSize: 16,
                                     fontWeight: FontWeight.w600,),
                                 ),
                               ),
@@ -269,7 +312,6 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                         // list of student
                         ListView.builder(
                             shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
                             itemCount: studentListController.studentList.length,
                             itemBuilder: (context, index) {
                              final isSelected = studentListController.isPresentList[index];
@@ -319,7 +361,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
         children: [
           const Text(
             'Select Class Time',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
           ),
           const SizedBox(height: 8),
           Obx(
@@ -365,7 +407,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
         children: [
           const Text(
             'Select Lab Number',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
           ),
           const SizedBox(height: 8),
           Obx(
@@ -419,7 +461,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
         children: [
           const Text(
             'Select Class Day',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
           ),
           const SizedBox(height: 8),
           Obx(
