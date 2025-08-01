@@ -94,17 +94,18 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                     const SizedBox(height: 36),
                     ElevatedButton(
                       onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          // TODO: Move to admin panel;
-                          Get.off(() =>  AdminPanelScreen());
-                        }
-                        else if (_usernameController.text.isEmpty || _passwordController.text.isEmpty) {
-
-                        }
-                        else {
-                          // TODO: if auth fail due to invalid data show this.
-                          showSnackBarMessage(subtitle: 'Invalid username & password!', isErrorMessage: true);
-                        }
+                        Get.offAll(() =>  AdminPanelScreen());
+                        // if (_formKey.currentState!.validate()) {
+                        //   // TODO: Move to admin panel;
+                        //   Get.off(() =>  AdminPanelScreen());
+                        // }
+                        // else if (_usernameController.text.isEmpty || _passwordController.text.isEmpty) {
+                        //
+                        // }
+                        // else {
+                        //   // TODO: if auth fail due to invalid data show this.
+                        //   showSnackBarMessage(subtitle: 'Invalid username & password!', isErrorMessage: true);
+                        // }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.deepPurple,

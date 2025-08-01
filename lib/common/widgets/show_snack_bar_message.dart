@@ -16,7 +16,7 @@ void showSnackBarMessage({String? title, required String subtitle, required bool
             children: [
               TextSpan(
                 text: subtitle,
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 16),
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 16),
               ),
             ],
           ),

@@ -17,6 +17,8 @@ dependencies:
   flutter_dotenv: ^5.2.1
   cupertino_icons: ^1.0.8
   intl: ^0.18.1
+  file_picker: ^10.2.1
+  csv: ^5.1.1
 
 
 dev_dependencies:

@@ -1,7 +1,14 @@
+import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:csv/csv.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ntc_sas/admin_panel/add_csv_file_screen.dart';
 import 'package:ntc_sas/admin_panel/add_single_student_screen.dart';
+import 'package:ntc_sas/common/widgets/show_snack_bar_message.dart';
 import 'package:ntc_sas/student_list/controller/student_list_controller.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'controller/admin_panel_controller.dart';
@@ -76,89 +83,268 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                 child: LayoutBuilder(
                   builder: (context, constraints) {
                     return SizedBox(
-                      // cardWidth will be double.maxfinite but for full screen padding it shrink some space.
+                      // cardWidth will be double.maxFinite but for full screen padding it shrink some space.
                       width: cardWidth,
                       // card content padding.
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                        child: Column(
+                        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 8),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            Wrap(
-                              spacing: 32,
-                              runSpacing: 32,
-                              alignment: WrapAlignment.spaceAround,
+                            Column(
                               children: [
-                                // ✅ Class Day
-                                buildClassDaySelector(showStudentListInAdminController),
+                                // day, time, lab dropdown
+                                Wrap(
+                                  spacing: 32,
+                                  runSpacing: 32,
+                                  alignment: WrapAlignment.spaceAround,
+                                  children: [
+                                    // ✅ Class Day
+                                    buildClassDaySelector(showStudentListInAdminController),
 
-                                // ✅ Lab Number
-                                buildLabNoSelector(showStudentListInAdminController),
+                                    // ✅ Lab Number
+                                    buildLabNoSelector(showStudentListInAdminController),
 
-                                // ✅ Class Time
-                                buildClassTimeSelector(showStudentListInAdminController),
+                                    // ✅ Class Time
+                                    buildClassTimeSelector(showStudentListInAdminController),
+                                  ],
+                                ),
+                                const SizedBox(height: 8,),
+
+                                // add student, show data, add CSV buttons
+                                Wrap(
+                                  spacing: 32,
+                                  runSpacing: 32,
+                                  alignment: WrapAlignment.spaceAround,
+                                  crossAxisAlignment: WrapCrossAlignment.center,
+                                  children: [
+                                    // Add single student button
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        // TODO: Add Single student button functionality
+                                        final TextEditingController studentRollController = TextEditingController();
+                                        final TextEditingController studentNameController = TextEditingController();
+                                        final String? selectedLabNo = showStudentListInAdminController.selectedLabNo.value;
+                                        final String? selectedClassTime = showStudentListInAdminController.selectedClassTime.value;
+                                        final String? selectedClassDay = showStudentListInAdminController.selectedClassDay.value;
+                                        if(selectedLabNo == null || selectedLabNo.isEmpty ||
+                                        selectedClassTime == null || selectedClassTime.isEmpty ||
+                                        selectedClassDay == null || selectedClassDay.isEmpty) {
+                                          showSnackBarMessage(subtitle: 'Select Lab No, Class Time & Day first.', isErrorMessage: true);
+                                        }
+                                        else {
+                                          showDialog(
+                                            context: context,
+                                            builder: (context) => AlertDialog(
+                                              title: Text('Add a student'),
+                                              actions: [
+                                                TextField(
+                                                  controller: studentRollController,
+                                                  decoration: InputDecoration(
+                                                    labelText: 'Student Roll(e.g. 3600)',
+                                                    border: OutlineInputBorder(
+                                                      borderRadius: BorderRadius.circular(8),
+                                                    ),
+                                                    enabledBorder: OutlineInputBorder(
+                                                      borderRadius: BorderRadius.circular(8),
+                                                    ),
+                                                    focusedBorder: OutlineInputBorder(
+                                                      borderRadius: BorderRadius.circular(8),
+                                                    ),
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 16,),
+                                                TextField(
+                                                  controller: studentNameController,
+                                                  decoration: InputDecoration(
+                                                    labelText: 'Student Name(e.g. Shaon)',
+                                                    border: OutlineInputBorder(
+                                                      borderRadius: BorderRadius.circular(8),
+                                                    ),
+                                                    enabledBorder: OutlineInputBorder(
+                                                      borderRadius: BorderRadius.circular(8),
+                                                    ),
+                                                    focusedBorder: OutlineInputBorder(
+                                                      borderRadius: BorderRadius.circular(8),
+                                                    ),
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 8,),
+                                                Row(
+                                                  mainAxisAlignment: MainAxisAlignment.end,
+                                                  spacing: 16,
+                                                  children: [
+                                                    ElevatedButton(
+                                                      onPressed: () {
+                                                        Get.back();
+                                                      },
+                                                      style: ElevatedButton.styleFrom(
+                                                        shape: RoundedRectangleBorder
+                                                          (borderRadius: BorderRadius.circular(12,),),
+                                                        backgroundColor: Colors.red.shade500,
+
+                                                      ),
+                                                      child: Text('Cancel', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w400, ),),
+                                                    ),
+                                                    ElevatedButton(
+                                                      onPressed: () async{
+                                                        final studentData = {
+                                                          'student_roll' : studentRollController.text,
+                                                          'student_name' : studentNameController.text,
+                                                          'class_room' : showStudentListInAdminController.selectedLabNo.toString(),
+                                                          'class_time' : showStudentListInAdminController.selectedClassTime.toString(),
+                                                          'class_day' : showStudentListInAdminController.selectedClassDay.toString(),
+                                                        };
+                                                        if(studentRollController.text.isNotEmpty || studentNameController.text.isNotEmpty) {
+                                                          await Supabase.instance.client.from('student').insert(studentData);
+                                                          Get.back();
+                                                          studentRollController.clear();
+                                                          studentNameController.clear();
+                                                          showSnackBarMessage(subtitle: 'Student added successfully!', isErrorMessage: false);
+
+                                                          await studentListController.getStudentList(
+                                                            labNo: showStudentListInAdminController.selectedLabNo.toString(),
+                                                            classTime: showStudentListInAdminController.selectedClassTime.toString(),
+                                                            classDay: showStudentListInAdminController.selectedClassDay.toString(),
+                                                          );
+                                                          setState(() {});
+
+                                                        }
+                                                        else {
+                                                          showSnackBarMessage(subtitle: 'Enter Student Roll and Name.', isErrorMessage: true);
+                                                        }
+                                                      },
+                                                      style: ElevatedButton.styleFrom(
+                                                        shape: RoundedRectangleBorder
+                                                          (borderRadius: BorderRadius.circular(12,),),
+                                                        backgroundColor: Colors.green.shade500,
+                                                      ),
+                                                      child: Text('Add', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w400, ),),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        }
+
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        shape: RoundedRectangleBorder
+                                          (borderRadius: BorderRadius.circular(8,),),
+                                        fixedSize: Size(200, 36),
+                                        backgroundColor: Colors.green.shade500,
+                                      ),
+                                      child: Text(
+                                        'Add a student', style: Theme.of(context).textTheme.titleMedium!.copyWith(fontSize: 16, fontWeight: FontWeight.w600,),),
+                                    ),
+                                    // Show Data button
+                                    ElevatedButton(
+                                      onPressed: () async{
+                                        // TODO: Show student list functionality
+                                        selectedStudents.clear();
+                                        await studentListController.getStudentList(
+                                            labNo: showStudentListInAdminController.selectedLabNo.toString(),
+                                            classTime: showStudentListInAdminController.selectedClassTime.toString(),
+                                            classDay: showStudentListInAdminController.selectedClassDay.toString());
+                                         setState(() {});
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        shape: RoundedRectangleBorder
+                                          (borderRadius: BorderRadius.circular(8,),),
+                                        fixedSize: Size(200, 36),
+                                        backgroundColor: Colors.blueGrey.shade200,
+                                      ),
+                                      child: Text(
+                                        'Show Data', style: Theme.of(context).textTheme.titleMedium!.copyWith(fontSize: 16, fontWeight: FontWeight.w600,),),
+                                    ),
+                                    // Add student csv button
+                                    ElevatedButton(
+                                      onPressed: () async{
+                                        // TODO: Add student csv button functionality
+                                        showDialog(context: context, builder: (context) => AlertDialog(
+                                          title: Text('Add CSV file'),
+                                          content: ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                              backgroundColor: Colors.blue,
+                                            ),
+                                              onPressed: () async{
+                                                await pickAndUploadCSV();
+                                              },
+                                              child: Text('Select CSV file', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.white),),),
+                                          actions: [
+                                            ElevatedButton(
+                                              onPressed: () {
+                                                Get.back();
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                shape: RoundedRectangleBorder
+                                                  (borderRadius: BorderRadius.circular(12,),),
+                                                backgroundColor: Colors.red.shade500,
+                                              ),
+                                              child: Text('Cancel', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w400, ),),
+                                            ),
+                                            ElevatedButton(
+                                              onPressed: () async {
+                                                if (records == null || records!.isEmpty) {
+                                                  Get.back();
+                                                  showSnackBarMessage(subtitle: 'No data found in CSV file!', isErrorMessage: true);
+                                                  return;
+                                                }
+
+                                                try {
+                                                  final supabase = Supabase.instance.client;
+                                                  final response = await supabase.from('student').insert(records!).select();
+
+                                                  if (response != null) {
+                                                    Get.back();
+                                                    print(response);
+                                                    showSnackBarMessage(subtitle: 'CSV file added successfully!', isErrorMessage: false);
+
+                                                  }
+                                                } catch (e) {
+                                                  Get.back();
+                                                  print(e);
+                                                  showSnackBarMessage(subtitle: 'Upload failed. Already exist!', isErrorMessage: true);
+                                                }
+                                                records = null;
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                                backgroundColor: Colors.green.shade500,
+                                              ),
+                                              child: Text('Add', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w400, ),),
+                                            ),
+
+                                          ],
+                                        ));
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        shape: RoundedRectangleBorder
+                                          (borderRadius: BorderRadius.circular(8,),),
+                                        fixedSize: Size(200, 36),
+                                        backgroundColor: Colors.blue,
+                                      ),
+                                      child: Text(
+                                        'Add CSV file', style: Theme.of(context).textTheme.titleMedium!.copyWith(fontSize: 16, fontWeight: FontWeight.w600,),),
+                                    ),
+                                  ],
+                                ),
+
                               ],
                             ),
-                            const SizedBox(height: 8,),
-
-                            Wrap(
-                              spacing: 32,
-                              runSpacing: 32,
-                              alignment: WrapAlignment.spaceAround,
-                              children: [
-                                // Add single student button
-                                ElevatedButton(
-                                  onPressed: () {
-                                    // TODO: Add Single student button functionality
-                                    Get.to(const AddSingleStudentScreen());
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    shape: RoundedRectangleBorder
-                                      (borderRadius: BorderRadius.circular(12,),),
-                                    fixedSize: Size(256, 40),
-                                    backgroundColor: Colors.green.shade500,
-                                  ),
-                                  child: Text(
-                                    'Add a student', style: Theme.of(context).textTheme.titleMedium!.copyWith(fontSize: 18, fontWeight: FontWeight.w600,),),
-                                ),
-                                // Show Data button
-                                ElevatedButton(
-                                  onPressed: () async{
-                                    // TODO: Show student list functionality
-                                    selectedStudents.clear();
-                                    await studentListController.getStudentList(
-                                        labNo: showStudentListInAdminController.selectedLabNo.toString(),
-                                        classTime: showStudentListInAdminController.selectedClassTime.toString(),
-                                        classDay: showStudentListInAdminController.selectedClassDay.toString());
-                                     setState(() {});
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    shape: RoundedRectangleBorder
-                                      (borderRadius: BorderRadius.circular(12,),),
-                                    fixedSize: Size(256, 40),
-                                    backgroundColor: Colors.blueGrey.shade200,
-                                  ),
-                                  child: Text(
-                                    'Show Data', style: Theme.of(context).textTheme.titleMedium!.copyWith(fontSize: 18, fontWeight: FontWeight.w600,),),
-                                ),
-                                // Add student csv button
-                                ElevatedButton(
-                                  onPressed: () {
-                                    // TODO: Add student csv button functionality
-                                    Get.to(const AddCsvFileScreen());
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    shape: RoundedRectangleBorder
-                                      (borderRadius: BorderRadius.circular(12,),),
-                                    fixedSize: Size(256, 40),
-                                    backgroundColor: Colors.blue,
-                                  ),
-                                  child: Text(
-                                    'Add CSV file', style: Theme.of(context).textTheme.titleMedium!.copyWith(fontSize: 18, fontWeight: FontWeight.w600,),),
-                                ),
-
-                              ],
+                            const SizedBox(width: 16,),
+                            TextButton(
+                              onPressed: () {},
+                              style: ButtonStyle(
+                                minimumSize: WidgetStatePropertyAll(Size(150, 48)),
+                                  backgroundColor: WidgetStatePropertyAll(Colors.amber.shade500),
+                                  shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
+                                  fixedSize: WidgetStatePropertyAll(Size(72, 8))
+                              ),
+                              child: Text('Search student', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.black),),
                             ),
-
                           ],
                         ),
                       ),
@@ -187,7 +373,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                   child: Wrap(
                     spacing: 32,
                     runSpacing: 32,
-                    alignment: WrapAlignment.spaceAround,
+                    alignment: WrapAlignment.center,
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       Text('Move to:', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),),
@@ -262,91 +448,120 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
     );
   }
 
+  List<Map<String, dynamic>>? records;
+  Future<void> pickAndUploadCSV() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['csv'],
+      withData: true,
+    );
+
+    if (result != null && result.files.single.bytes != null) {
+      final Uint8List fileBytes = result.files.single.bytes!;
+      final String csvString = utf8.decode(fileBytes);
+
+      final List<List<dynamic>> csvData =
+      const CsvToListConverter().convert(csvString);
+
+      final headers = csvData.first.cast<String>();
+      final rows = csvData.skip(1);
+
+      records = rows.map((row) {
+        final Map<String, dynamic> record = {};
+        for (int i = 0; i < headers.length; i++) {
+          record[headers[i]] = row[i];
+        }
+        return record;
+      }).toList();
+      
+      print(records);
+
+    }
+  }
+
+
   Widget buildShowStudentList(double? cardWidth) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 32),
         child: Card(
-          child: SizedBox(
-            width: cardWidth,
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return SizedBox(
-                  width: cardWidth,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 8),
-                    child: Column(
-                      children: [
-                        // student list header
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            DecoratedBox(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                color: Colors.grey.shade300,
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                child: Text('Enrolled Student',
-                                  style: TextStyle(fontSize: 16,
-                                    fontWeight: FontWeight.w600,),
-                                ),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SizedBox(
+                width: cardWidth,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 8),
+                  child: Column(
+                    children: [
+                      // student list header
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          DecoratedBox(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              color: Colors.grey.shade300,
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              child: Text('Enrolled Student',
+                                style: TextStyle(fontSize: 16,
+                                  fontWeight: FontWeight.w600,),
                               ),
                             ),
-                            DecoratedBox(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                color: Colors.grey.shade300,
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                child: Text('${studentListController.studentList.length} Students',
-                                  style: TextStyle(fontSize: 16,
-                                    fontWeight: FontWeight.w600,),
-                                ),
+                          ),
+                          DecoratedBox(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              color: Colors.grey.shade300,
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              child: Text('${studentListController.studentList.length} Students',
+                                style: TextStyle(fontSize: 16,
+                                  fontWeight: FontWeight.w600,),
                               ),
                             ),
-                          ],
-                        ),
-                        // list of student
-                        ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: studentListController.studentList.length,
-                            itemBuilder: (context, index) {
-                             final isSelected = studentListController.isPresentList[index];
-                              return ListTile(
-                                leading: Text('${index+1}. ', style: TextStyle(fontSize: 16),),
-                                title: Text('${studentListController.studentList[index]['student_roll']} - ${studentListController.studentList[index]['student_name']}'),
-                                trailing: IconButton(
-                                    onPressed: () {
-                                      studentListController.isPresentList[index] = !isSelected;
-                                      selectedStudents.removeWhere(
-                                              (e) =>
-                                              e['student_roll'] == studentListController.studentList[index]['student_roll']);
-                                      if(studentListController.isPresentList[index]) {
-                                        selectedStudents.add({
-                                          'student_roll' : studentListController.studentList[index]['student_roll']
-                                        });
-                                      }
+                          ),
+                        ],
+                      ),
+                      // list of student
+                      ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: studentListController.studentList.length,
+                          itemBuilder: (context, index) {
+                           final isSelected = studentListController.isPresentList[index];
+                            return ListTile(
+                              leading: Text('${index+1}. ', style: TextStyle(fontSize: 16),),
+                              title: Text('${studentListController.studentList[index]['student_roll']} - ${studentListController.studentList[index]['student_name']}'),
+                              trailing: IconButton(
+                                  onPressed: () {
+                                    studentListController.isPresentList[index] = !isSelected;
+                                    selectedStudents.removeWhere(
+                                            (e) =>
+                                            e['student_roll'] == studentListController.studentList[index]['student_roll']);
+                                    if(studentListController.isPresentList[index]) {
+                                      selectedStudents.add({
+                                        'student_roll' : studentListController.studentList[index]['student_roll']
+                                      });
+                                    }
 
-                                      print(selectedStudents);
-                                      setState(() {});
-                                    },
-                                    icon: Icon(
-                                      isSelected ? Icons.check_box : Icons.check_box_outline_blank,
-                                      color: isSelected ? Colors.green : null,
-                                    ),
-                                ),
-                              );
-                            },
-                        ),
-                      ],
-                    ),
+                                    print(selectedStudents);
+                                    setState(() {});
+                                  },
+                                  icon: Icon(
+                                    isSelected ? Icons.check_box : Icons.check_box_outline_blank,
+                                    color: isSelected ? Colors.green : null,
+                                  ),
+                              ),
+                            );
+                          },
+                      ),
+                    ],
                   ),
-                );
-              },
-            ),
+                ),
+              );
+            },
           ),
         ),
       ),
@@ -355,21 +570,16 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
 
   SizedBox buildClassTimeSelector(AdminPanelController controller) {
     return SizedBox(
-      width: 256,
+      width: 200,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Select Class Time',
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-          ),
-          const SizedBox(height: 8),
           Obx(
             () => DropdownMenu<String>(
               width: double.infinity,
               menuStyle: MenuStyle(
                 backgroundColor: WidgetStatePropertyAll(Colors.grey.shade300),
-                fixedSize: WidgetStatePropertyAll(Size(256, double.nan)),
+                fixedSize: WidgetStatePropertyAll(Size(200, double.nan)),
               ),
               label: const Text('Select Time'),
               inputDecorationTheme: InputDecorationTheme(
@@ -401,21 +611,16 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
 
   SizedBox buildLabNoSelector(AdminPanelController controller) {
     return SizedBox(
-      width: 256,
+      width: 200,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Select Lab Number',
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-          ),
-          const SizedBox(height: 8),
           Obx(
             () => DropdownMenu<String>(
               width: double.infinity,
               menuStyle: MenuStyle(
                 backgroundColor: WidgetStatePropertyAll(Colors.grey.shade300),
-                fixedSize: WidgetStatePropertyAll(Size(256, double.nan)),
+                fixedSize: WidgetStatePropertyAll(Size(200, double.nan)),
               ),
               label: const Text('Select Lab'),
               inputDecorationTheme: InputDecorationTheme(
@@ -455,21 +660,16 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
 
   SizedBox buildClassDaySelector(AdminPanelController controller) {
     return SizedBox(
-      width: 256,
+      width: 200,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Select Class Day',
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-          ),
-          const SizedBox(height: 8),
           Obx(
             () => DropdownMenu<String>(
               width: double.infinity,
               menuStyle: MenuStyle(
                 backgroundColor: WidgetStatePropertyAll(Colors.grey.shade300),
-                fixedSize: WidgetStatePropertyAll(Size(256, double.nan)),
+                fixedSize: WidgetStatePropertyAll(Size(200, double.nan)),
               ),
               label: const Text('Select Day'),
               inputDecorationTheme: InputDecorationTheme(
