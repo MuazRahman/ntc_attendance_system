@@ -1,17 +1,12 @@
-import 'dart:convert';
-import 'dart:io';
-import 'dart:typed_data';
-
-import 'package:csv/csv.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ntc_sas/admin_panel/add_csv_file_screen.dart';
-import 'package:ntc_sas/admin_panel/add_single_student_screen.dart';
+import 'package:ntc_sas/admin_panel/admin_login_screen.dart';
+import 'package:ntc_sas/admin_panel/widgets/csv_picker.dart';
 import 'package:ntc_sas/common/widgets/show_snack_bar_message.dart';
 import 'package:ntc_sas/student_list/controller/student_list_controller.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'controller/admin_panel_controller.dart';
+import 'controller/day_time_lab_selection_controller.dart';
+import 'controller/upload_csv_file_controller.dart';
 
 class AdminPanelScreen extends StatefulWidget {
    const AdminPanelScreen({super.key});
@@ -28,9 +23,10 @@ class AdminPanelScreen extends StatefulWidget {
 
 class _AdminPanelScreenState extends State<AdminPanelScreen> {
 
-  final AdminPanelController showStudentListInAdminController = Get.find<AdminPanelController>(tag: 'showStudentsInAdmin');
-  final AdminPanelController moveStudentRoutineController = Get.find<AdminPanelController>(tag: 'moveStudentInAdmin');
+  final DayTimeLabSelectionController showStudentListInAdminController = Get.find<DayTimeLabSelectionController>(tag: 'showStudentsInAdmin');
+  final DayTimeLabSelectionController moveStudentRoutineController = Get.find<DayTimeLabSelectionController>(tag: 'moveStudentInAdmin');
   final StudentListController studentListController = Get.find<StudentListController>();
+  final CsvFilePickerAndUploadController csvUploadController = Get.find<CsvFilePickerAndUploadController>();
   List<Map<String, dynamic>> selectedStudents = [];
 
   @override
@@ -66,10 +62,11 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
         backgroundColor: Colors.grey.shade300,
         leading: IconButton(
           onPressed: () {
-            Get.back();
+            Get.offAll(AdminLoginScreen());
           },
           color: Colors.red,
           icon: Icon(Icons.arrow_back_ios_new_outlined,),
+          tooltip: 'Log out',
         ),
       ),
       // full screen padding
@@ -195,7 +192,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                                                           'class_time' : showStudentListInAdminController.selectedClassTime.toString(),
                                                           'class_day' : showStudentListInAdminController.selectedClassDay.toString(),
                                                         };
-                                                        if(studentRollController.text.isNotEmpty || studentNameController.text.isNotEmpty) {
+                                                        if(studentRollController.text.isNotEmpty && studentNameController.text.isNotEmpty) {
                                                           await Supabase.instance.client.from('student').insert(studentData);
                                                           Get.back();
                                                           studentRollController.clear();
@@ -262,18 +259,22 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                                     ElevatedButton(
                                       onPressed: () async{
                                         // TODO: Add student csv button functionality
+                                        final PickCSVFile csvFilePicker = PickCSVFile();
+
                                         showDialog(context: context, builder: (context) => AlertDialog(
                                           title: Text('Add CSV file'),
+                                          // pick csv file
                                           content: ElevatedButton(
                                             style: ElevatedButton.styleFrom(
                                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                               backgroundColor: Colors.blue,
                                             ),
-                                              onPressed: () async{
-                                                await pickAndUploadCSV();
+                                              onPressed: () {
+                                                csvUploadController.pickCsvFile(csvFilePicker);
                                               },
                                               child: Text('Select CSV file', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.white),),),
                                           actions: [
+                                            // cancel csv upload
                                             ElevatedButton(
                                               onPressed: () {
                                                 Get.back();
@@ -285,30 +286,10 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                                               ),
                                               child: Text('Cancel', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w400, ),),
                                             ),
+                                            // upload csv file in database
                                             ElevatedButton(
-                                              onPressed: () async {
-                                                if (records == null || records!.isEmpty) {
-                                                  Get.back();
-                                                  showSnackBarMessage(subtitle: 'No data found in CSV file!', isErrorMessage: true);
-                                                  return;
-                                                }
-
-                                                try {
-                                                  final supabase = Supabase.instance.client;
-                                                  final response = await supabase.from('student').insert(records!).select();
-
-                                                  if (response != null) {
-                                                    Get.back();
-                                                    print(response);
-                                                    showSnackBarMessage(subtitle: 'CSV file added successfully!', isErrorMessage: false);
-
-                                                  }
-                                                } catch (e) {
-                                                  Get.back();
-                                                  print(e);
-                                                  showSnackBarMessage(subtitle: 'Upload failed. Already exist!', isErrorMessage: true);
-                                                }
-                                                records = null;
+                                              onPressed: () {
+                                                csvUploadController.uploadCsvData(csvFilePicker);
                                               },
                                               style: ElevatedButton.styleFrom(
                                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -448,37 +429,6 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
     );
   }
 
-  List<Map<String, dynamic>>? records;
-  Future<void> pickAndUploadCSV() async {
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['csv'],
-      withData: true,
-    );
-
-    if (result != null && result.files.single.bytes != null) {
-      final Uint8List fileBytes = result.files.single.bytes!;
-      final String csvString = utf8.decode(fileBytes);
-
-      final List<List<dynamic>> csvData =
-      const CsvToListConverter().convert(csvString);
-
-      final headers = csvData.first.cast<String>();
-      final rows = csvData.skip(1);
-
-      records = rows.map((row) {
-        final Map<String, dynamic> record = {};
-        for (int i = 0; i < headers.length; i++) {
-          record[headers[i]] = row[i];
-        }
-        return record;
-      }).toList();
-      
-      print(records);
-
-    }
-  }
-
 
   Widget buildShowStudentList(double? cardWidth) {
     return Center(
@@ -568,7 +518,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
     );
   }
 
-  SizedBox buildClassTimeSelector(AdminPanelController controller) {
+  SizedBox buildClassTimeSelector(DayTimeLabSelectionController controller) {
     return SizedBox(
       width: 200,
       child: Column(
@@ -609,7 +559,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
     );
   }
 
-  SizedBox buildLabNoSelector(AdminPanelController controller) {
+  SizedBox buildLabNoSelector(DayTimeLabSelectionController controller) {
     return SizedBox(
       width: 200,
       child: Column(
@@ -658,7 +608,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
     );
   }
 
-  SizedBox buildClassDaySelector(AdminPanelController controller) {
+  SizedBox buildClassDaySelector(DayTimeLabSelectionController controller) {
     return SizedBox(
       width: 200,
       child: Column(

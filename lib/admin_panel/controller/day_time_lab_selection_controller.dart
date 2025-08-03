@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 
-class AdminPanelController extends GetxController {
+class DayTimeLabSelectionController extends GetxController {
   final List<String> classTimes = [
     '8:00 - 10:00',
     '10:00 - 12:00',
