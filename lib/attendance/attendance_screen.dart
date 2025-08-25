@@ -112,78 +112,80 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
         },
         icon: Icon(Icons.arrow_back_ios_new_outlined,),
       ),
-      title: const Center(
-        child: Text(
-          'NTC Attendance System',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-        ),
+      title: Text(
+        'NTC Attendance System',
+        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
       ),
     );
   }
 
   Widget buildStudentList(StudentListController controller) {
     return Expanded(
-                  child: ListView.builder(
-                    itemCount: controller.studentList.length,
-                    itemBuilder: (context, index) {
-                      final student = controller.studentList[index];
-                      final isPresent = controller.isPresentList[index];
+      child: ListView.builder(
+        itemCount: controller.studentList.length,
+        itemBuilder: (context, index) {
+          final student = controller.studentList[index];
+          final isPresent = controller.isPresentList[index];
 
-                      return Card(
-                        color: Colors.green.shade50,
-                        margin: const EdgeInsets.symmetric(vertical: 4),
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-                          leading: SizedBox(
-                            width: 24,
-                            child: Text(
-                              '${index + 1}.',
-                              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
-                            ),
-                          ),
-                          title: Text('${student['student_roll']} - ${student['student_name']}'),
-                          trailing: SizedBox(
-                            width: 88,
-                            child: IconButton(
-                              icon: Icon(
-                                isPresent ? Icons.check_box : Icons.check_box_outline_blank,
-                                color: isPresent ? Colors.green : Colors.red,
-                              ),
-                              onPressed: () {
-                                controller.isPresentList[index] = !isPresent;
-
-                                final studentRoll = student['student_roll'];
-                                final teacherID = widget.teachers.indexOf(widget.selectedTeacher) + 1;
-
-                                attendanceList.removeWhere(
-                                      (e) =>
-                                  e['teacher_id'] == teacherID &&
-                                      e['student_roll'] == studentRoll &&
-                                      e['class_time'] == widget.classTime &&
-                                      e['class_room'] == widget.labNo,
-                                );
-
-                                if (controller.isPresentList[index]) {
-                                  attendanceList.add({
-                                    'teacher_id': teacherID,
-                                    'student_roll': studentRoll,
-                                    'attendance_date': DateFormat('yyyy-MM-dd').format(DateTime.now()),
-                                    'is_present': true,
-                                    'class_time': widget.classTime,
-                                    'class_room': widget.labNo,
-                                    'class_day': widget.classDay,
-                                  });
-                                }
-
-                                controller.update();
-                              },
-                            ),
-                          ),
-                        ),
-                      );
-                    },
+          return Card(
+            color: Colors.green.shade100,
+            margin: const EdgeInsets.symmetric(vertical: 4),
+            child: ListTile(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+              leading: SizedBox(
+                width: 24,
+                child: Text(
+                  '${index + 1}.',
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w600, fontSize: 16),
+                ),
+              ),
+              title: Text(
+                  '${student['student_roll']} - ${student['student_name']}'),
+              trailing: SizedBox(
+                width: 88,
+                child: IconButton(
+                  icon: Icon(
+                    isPresent ? Icons.check_box : Icons.check_box_outline_blank,
+                    color: isPresent ? Colors.green : Colors.red,
                   ),
-                );
+                  onPressed: () {
+                    controller.isPresentList[index] = !isPresent;
+
+                    final studentRoll = student['student_roll'];
+                    final teacherID = widget.teachers.indexOf(
+                        widget.selectedTeacher) + 1;
+
+                    attendanceList.removeWhere(
+                          (e) =>
+                      e['teacher_id'] == teacherID &&
+                          e['student_roll'] == studentRoll &&
+                          e['class_time'] == widget.classTime &&
+                          e['class_room'] == widget.labNo,
+                    );
+
+                    if (controller.isPresentList[index]) {
+                      attendanceList.add({
+                        'teacher_id': teacherID,
+                        'student_roll': studentRoll,
+                        'attendance_date': DateFormat('yyyy-MM-dd').format(
+                            DateTime.now()),
+                        'is_present': true,
+                        'class_time': widget.classTime,
+                        'class_room': widget.labNo,
+                        'class_day': widget.classDay,
+                      });
+                    }
+
+                    controller.update();
+                  },
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
   }
 
   Widget _buildHeader() {
