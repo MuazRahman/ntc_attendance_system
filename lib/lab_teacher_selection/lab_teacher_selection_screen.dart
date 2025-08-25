@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ntc_sas/attendance/attendance_screen.dart';
+import 'package:ntc_sas/common/widgets/screen_background.dart';
 import 'package:ntc_sas/common/widgets/show_snack_bar_message.dart';
 import 'controller/lab_teacher_selection_controller.dart';
 
@@ -29,63 +30,67 @@ class _LabTeacherSelectionScreenState extends State<LabTeacherSelectionScreen> {
     final titleSmall = Theme.of(context).textTheme.titleSmall;
 
     return Scaffold(
-      backgroundColor: Colors.grey.shade300,
+      // backgroundColor: Colors.grey.shade300,
       appBar: AppBar(
         centerTitle: true,
         automaticallyImplyLeading: false,
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.green,
         leading: IconButton(
           onPressed: () {
             Get.back();
           },
           icon: Icon(Icons.arrow_back_ios_new_outlined,),
         ),
+        title: Text('NTC Attendance System', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 22),),
       ),
-      body: SingleChildScrollView(
-        child: Center(
-          child: Column(
-            children: [
-              const SizedBox(height: 164),
-              const Text(
-                'Select Attendance Info',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 64),
-              Column(
-                children: [
-                  _buildLabCard(titleMedium, titleSmall),
-                  const SizedBox(height: 24),
-                  _buildTeacherCard(titleMedium, titleSmall),
-                ],
-              ),
-              const SizedBox(height: 64),
-              SizedBox(
-                height: 44,
-                width: 256,
-                child: Obx(() => ElevatedButton(
-                  onPressed: labTeacherSelectionController.isValid
-                      ? () => _showStudentList(context)
-                      : null,
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+      body: ScreenBackground(
+        child: SingleChildScrollView(
+          child: Center(
+            child: Column(
+              children: [
+                // const SizedBox(height: 164),
+                const SizedBox(height: 72,),
+                const Text(
+                  'Select Attendance Info',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 32),
+                Column(
+                  children: [
+                    _buildLabCard(titleMedium, titleSmall),
+                    const SizedBox(height: 24),
+                    _buildTeacherCard(titleMedium, titleSmall),
+                  ],
+                ),
+                const SizedBox(height: 64),
+                SizedBox(
+                  height: 44,
+                  width: 256,
+                  child: Obx(() => ElevatedButton(
+                    onPressed: labTeacherSelectionController.isValid
+                        ? () => _showStudentList(context)
+                        : null,
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      backgroundColor: labTeacherSelectionController.isValid
+                          ? Colors.green
+                          : Colors.blueGrey.shade200,
                     ),
-                    backgroundColor: labTeacherSelectionController.isValid
-                        ? Colors.green
-                        : Colors.blueGrey.shade200,
-                  ),
-                  child: const Text(
-                    'Show Student List',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold),
-                  ),
-                )),
-              ),
-              const SizedBox(height: 28),
-              const Text('Please select lab & class time carefully!'),
-            ],
+                    child: const Text(
+                      'Show Student List',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  )),
+                ),
+                const SizedBox(height: 28),
+                const Text('Please select lab & class time carefully!'),
+              ],
+            ),
           ),
         ),
       ),
@@ -94,12 +99,13 @@ class _LabTeacherSelectionScreenState extends State<LabTeacherSelectionScreen> {
 
   Widget _buildLabCard(TextStyle? titleMedium, TextStyle? titleSmall) {
     return Obx(() => SizedBox(
-      height: 128,
+      height: 170,
       width: 256,
       child: GestureDetector(
         onTap: () => Get.dialog(
           AlertDialog(
-            title: Text('Select Lab No.', style: titleMedium?.copyWith(fontSize: 24)),
+            backgroundColor: Colors.green.shade50,
+            title: Text('Select Lab No:', style: titleMedium?.copyWith(fontSize: 24, fontWeight: FontWeight.w600)),
             content: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -109,7 +115,13 @@ class _LabTeacherSelectionScreenState extends State<LabTeacherSelectionScreen> {
                       labTeacherSelectionController.selectLab(lab);
                       Get.back();
                     },
-                    child: Text(lab, style: titleSmall),
+                    child: Card(
+                      color: Colors.green.shade200,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 80, vertical: 12),
+                        child: Text(lab, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20,),),
+                      ),
+                    ),
                   );
                 }).toList(),
               ),
@@ -129,10 +141,10 @@ class _LabTeacherSelectionScreenState extends State<LabTeacherSelectionScreen> {
               end: Alignment.bottomRight,
             ),
             borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(32),
-              topRight: Radius.circular(8),
-              bottomLeft: Radius.circular(8),
-              bottomRight: Radius.circular(32),
+              topLeft: Radius.circular(16),
+              topRight: Radius.circular(16),
+              bottomLeft: Radius.circular(16),
+              bottomRight: Radius.circular(16),
             ),
           ),
           child: Center(
@@ -165,11 +177,12 @@ class _LabTeacherSelectionScreenState extends State<LabTeacherSelectionScreen> {
 
   Widget _buildTeacherCard(TextStyle? titleMedium, TextStyle? titleSmall) {
     return Obx(() => SizedBox(
-      height: 128,
+      height: 170,
       width: 256,
       child: GestureDetector(
         onTap: () => Get.dialog(
           AlertDialog(
+            backgroundColor: Colors.green.shade50,
             title: Text('Select Teacher', style: titleMedium?.copyWith(fontSize: 24)),
             content: SingleChildScrollView(
               child: Column(
@@ -180,7 +193,11 @@ class _LabTeacherSelectionScreenState extends State<LabTeacherSelectionScreen> {
                       labTeacherSelectionController.selectTeacher(teacher);
                       Get.back();
                     },
-                    child: Text(teacher, style: titleSmall),
+                    child: Card(
+                        color: Colors.green.shade200,
+                        child: SizedBox(
+                          height: 48, width: 180,
+                            child: Center(child: Text(teacher, style: titleSmall)))),
                   );
                 }).toList(),
               ),
@@ -190,7 +207,7 @@ class _LabTeacherSelectionScreenState extends State<LabTeacherSelectionScreen> {
           barrierDismissible: true,
         ),
         child: Container(
-          decoration: const BoxDecoration(
+          decoration:  BoxDecoration(
             gradient: LinearGradient(
               colors: [
                 Color(0xFF4A148C), // Deep Purple
@@ -199,11 +216,7 @@ class _LabTeacherSelectionScreenState extends State<LabTeacherSelectionScreen> {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(32),
-              topRight: Radius.circular(8),
-              bottomLeft: Radius.circular(8),
-              bottomRight: Radius.circular(32),
+            borderRadius: BorderRadius.all(Radius.circular(16)
             ),
           ),
           child: Center(

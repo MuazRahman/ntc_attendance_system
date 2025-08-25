@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:ntc_sas/admin_teacher_selection_screen.dart';
+import 'package:ntc_sas/common/widgets/screen_background.dart';
 import 'package:ntc_sas/utils/assets_paths.dart';
 import 'package:ntc_sas/utils/supabase_initializer.dart';
 
@@ -28,18 +29,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-        children: [
-          SvgPicture.asset(AssetsPath.backgroundImageSvg, fit: BoxFit.cover, height: double.maxFinite, width: double.maxFinite,),
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.asset(AssetsPath.ntcLogoPng,),
-              ],
-            ),
-          ),
-        ],
-    );
+    return ScreenBackground(
+        child: Center(child: Image.asset(AssetsPath.ntcLogoPng)));
   }
 }

@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:ntc_sas/admin_teacher_selection_screen.dart';
 import 'package:ntc_sas/attendance/controller/attendance_list_controller.dart';
+import 'package:ntc_sas/common/widgets/screen_background.dart';
 import 'package:ntc_sas/common/widgets/show_snack_bar_message.dart';
 import 'package:ntc_sas/common/widgets/auto_select_class_day.dart';
 import 'package:ntc_sas/student_list/controller/student_list_controller.dart';
@@ -53,44 +54,46 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade300,
+      backgroundColor: Colors.green,
       appBar: buildAppBar(),
-      body: Center(
-        child: SizedBox(
-          width: 600,
-          child: GetBuilder<StudentListController>(
-            builder: (controller) {
-              if (controller.inProgress) {
-                return const Center(child: CircularProgressIndicator());
-              }
+      body: ScreenBackground(
+        child: Center(
+          child: SizedBox(
+            width: 600,
+            child: GetBuilder<StudentListController>(
+              builder: (controller) {
+                if (controller.inProgress) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-              if (controller.studentList.isEmpty) {
-                return const Center(child: Text('No students found.'));
-              }
+                if (controller.studentList.isEmpty) {
+                  return const Center(child: Text('No students found.'));
+                }
 
-              return RefreshIndicator(
-                onRefresh: () => controller.getStudentList(
-                  labNo: widget.labNo,
-                  classTime: widget.classTime,
-                  classDay: widget.classDay,
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Column(
-                    children: [
-                      // teacherName, LabNo, ClassTime shows here
-                      _buildHeader(),
-                      const SizedBox(height: 8),
-                      // No, Roll & Name, Attendance
-                      _buildTableHeader(),
-                      const Divider(thickness: 0.5, color: Colors.black),
-                      // Student List
-                      buildStudentList(controller),
-                    ],
+                return RefreshIndicator(
+                  onRefresh: () => controller.getStudentList(
+                    labNo: widget.labNo,
+                    classTime: widget.classTime,
+                    classDay: widget.classDay,
                   ),
-                ),
-              );
-            },
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                      children: [
+                        // teacherName, LabNo, ClassTime shows here
+                        _buildHeader(),
+                        const SizedBox(height: 8),
+                        // No, Roll & Name, Attendance
+                        _buildTableHeader(),
+                        const Divider(thickness: 0.5, color: Colors.black),
+                        // Student List
+                        buildStudentList(controller),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
           ),
         ),
       ),
@@ -112,7 +115,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       title: const Center(
         child: Text(
           'NTC Attendance System',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
       ),
     );
@@ -127,6 +130,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                       final isPresent = controller.isPresentList[index];
 
                       return Card(
+                        color: Colors.green.shade50,
                         margin: const EdgeInsets.symmetric(vertical: 4),
                         child: ListTile(
                           contentPadding: const EdgeInsets.symmetric(horizontal: 16),
@@ -187,7 +191,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       height: 60,
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Colors.blueGrey.shade200,
+        color: Colors.green.shade100,
         borderRadius: BorderRadius.circular(8),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -197,16 +201,19 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(DateFormat('MMM d, yyyy').format(DateTime.now())),
-              Text(widget.classTime, style: const TextStyle(fontWeight: FontWeight.bold)),
-              Text(DaySelector.selectWeekDay(), style: const TextStyle(fontWeight: FontWeight.bold)),
+              Text(widget.labNo, style: const TextStyle(fontWeight: FontWeight.w600)),
+
+              Text(widget.classTime, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+              Text(widget.selectedTeacher, style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.black, fontSize: 15)),
+
             ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(widget.labNo, style: const TextStyle(fontWeight: FontWeight.bold)),
-              Text(widget.selectedTeacher, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.deepPurple)),
+              Text(DateFormat('MMM d, yyyy').format(DateTime.now())),
+              Text(DaySelector.selectWeekDay(), style: const TextStyle()),
+
             ],
           ),
         ],
@@ -221,18 +228,18 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
         children: const [
           SizedBox(
             width: 40,
-            child: Text('No.', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: Text('No.', style: TextStyle(fontWeight: FontWeight.w600)),
           ),
 
           SizedBox(
-            width: 194,
-            child: Text('Roll & Name', style: TextStyle(fontWeight: FontWeight.bold)),
+            width: 200,
+            child: Text('Roll & Name', style: TextStyle(fontWeight: FontWeight.w600)),
           ),
           SizedBox(
             width: 96,
             child: Text(
               'Attendance',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: TextStyle(fontWeight: FontWeight.w600),
               textAlign: TextAlign.center,
             ),
           ),
@@ -244,7 +251,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   Widget _buildBottomButtons() {
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.all(32.0),
+        padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 8),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
@@ -254,7 +261,14 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                 attendanceList.clear();
                 _studentListController.update();
               },
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  shadowColor: Colors.black,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    side: BorderSide(color: Colors.amber),
+                  )
+              ),
               child: const Text('Cancel', style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold)),
             ),
             ElevatedButton(
@@ -291,7 +305,14 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                   );
                 }
               },
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  shadowColor: Colors.black,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    side: BorderSide(color: Colors.amber)
+                  )
+              ),
               child: const Text(
                 'Submit',
                 style: TextStyle(

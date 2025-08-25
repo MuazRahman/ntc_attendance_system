@@ -61,6 +61,15 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                         labelStyle: TextStyle(color: Colors.grey),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: Colors.green),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: Colors.green),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: Colors.green),
                         ),
                         prefixIcon: Icon(Icons.person, color: Colors.grey,),
                       ),
@@ -80,6 +89,15 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                         labelStyle: TextStyle(color: Colors.grey, ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: Colors.green),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: Colors.green),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: Colors.green),
                         ),
                         prefixIcon: Icon(Icons.lock, color: Colors.grey,),
                       ),
@@ -108,7 +126,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                         // }
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.deepPurple,
+                        backgroundColor: Colors.green,
                         minimumSize: Size(double.infinity, 50),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                       ),
