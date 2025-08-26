@@ -4,6 +4,7 @@ import 'package:ntc_sas/admin_panel/controller/upload_csv_file_controller.dart';
 import 'package:ntc_sas/attendance/controller/attendance_list_controller.dart';
 import 'package:ntc_sas/lab_teacher_selection/controller/lab_teacher_selection_controller.dart';
 import 'package:ntc_sas/student_list/controller/student_list_controller.dart';
+import 'package:ntc_sas/auth/controller/auth_controller.dart';
 
 class ControllerBinder extends Bindings {
   @override
@@ -15,6 +16,7 @@ class ControllerBinder extends Bindings {
     Get.put(DayTimeLabSelectionController(), tag: 'showStudentsInAdmin');
     Get.put(DayTimeLabSelectionController(), tag: 'moveStudentInAdmin');
     Get.put(CsvFilePickerAndUploadController(), permanent: true);
+    Get.put(AuthController(), permanent: true);
 
 
   }

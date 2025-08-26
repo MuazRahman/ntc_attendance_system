@@ -6,6 +6,7 @@ import 'package:ntc_sas/attendance/controller/attendance_list_controller.dart';
 import 'package:ntc_sas/common/widgets/screen_background.dart';
 import 'package:ntc_sas/common/widgets/show_snack_bar_message.dart';
 import 'package:ntc_sas/common/widgets/auto_select_class_day.dart';
+import 'package:ntc_sas/lab_teacher_selection/lab_teacher_selection_screen.dart';
 import 'package:ntc_sas/student_list/controller/student_list_controller.dart';
 
 class AttendanceScreen extends StatefulWidget {
@@ -108,7 +109,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       backgroundColor: Colors.transparent,
       leading: IconButton(
         onPressed: () {
-          Get.offAll(() => AdminTeacherSelectorScreen());
+          Get.offAll(() => LabTeacherSelectionScreen());
         },
         icon: Icon(Icons.arrow_back_ios_new_outlined,),
       ),

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:ntc_sas/admin_teacher_selection_screen.dart';
 import 'package:ntc_sas/attendance/attendance_screen.dart';
 import 'package:ntc_sas/common/widgets/screen_background.dart';
 import 'package:ntc_sas/common/widgets/show_snack_bar_message.dart';
 import 'controller/lab_teacher_selection_controller.dart';
+import 'package:ntc_sas/auth/controller/auth_controller.dart';
+import 'package:ntc_sas/auth/update_password_screen.dart';
 
 class LabTeacherSelectionScreen extends StatefulWidget {
   const LabTeacherSelectionScreen({super.key});
@@ -12,8 +15,11 @@ class LabTeacherSelectionScreen extends StatefulWidget {
   State<LabTeacherSelectionScreen> createState() => _LabTeacherSelectionScreenState();
 }
 
+enum _MenuAction { updateProfile, logout }
+
 class _LabTeacherSelectionScreenState extends State<LabTeacherSelectionScreen> {
   final LabTeacherSelectionController labTeacherSelectionController = Get.find<LabTeacherSelectionController>();
+  final AuthController _authController = Get.find<AuthController>();
 
   @override
   void initState() {
@@ -37,11 +43,61 @@ class _LabTeacherSelectionScreenState extends State<LabTeacherSelectionScreen> {
         backgroundColor: Colors.green,
         leading: IconButton(
           onPressed: () {
-            Get.back();
+            Get.offAll(AdminTeacherSelectorScreen());
           },
           icon: Icon(Icons.arrow_back_ios_new_outlined,),
         ),
         title: Text('NTC Attendance System', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 22),),
+        actions: [
+          PopupMenuButton<_MenuAction>(
+            icon: const Icon(Icons.more_vert, color: Colors.white),
+            elevation: 8,
+            color: Colors.greenAccent.shade100,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            position: PopupMenuPosition.under,
+            offset: const Offset(0, 8),
+            onSelected: (value) async {
+              switch (value) {
+                case _MenuAction.updateProfile:
+                  Get.to(() => const UpdatePasswordScreen());
+                  break;
+                case _MenuAction.logout:
+                  await _authController.logout();
+                  Get.offAll(() => const AdminTeacherSelectorScreen());
+                  break;
+              }
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: _MenuAction.updateProfile,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6.0),
+                  child: Row(
+                    children: const [
+                      Icon(Icons.person_outline, color: Color(0xFF8E24AA)),
+                      SizedBox(width: 10),
+                      Text('Update profile', style: TextStyle(fontWeight: FontWeight.w600)),
+                    ],
+                  ),
+                ),
+              ),
+              const PopupMenuDivider(height: 2),
+              PopupMenuItem(
+                value: _MenuAction.logout,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6.0),
+                  child: Row(
+                    children: const [
+                      Icon(Icons.logout, color: Color(0xFF43A047)),
+                      SizedBox(width: 10),
+                      Text('Logout', style: TextStyle(fontWeight: FontWeight.w600)),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
       body: ScreenBackground(
         child: SingleChildScrollView(

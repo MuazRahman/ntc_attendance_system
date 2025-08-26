@@ -1,7 +1,9 @@
 import 'dart:ui'; // ✅ Needed for ImageFilter.blur
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:ntc_sas/auth/login_screen.dart';
 import 'package:ntc_sas/lab_teacher_selection/lab_teacher_selection_screen.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'admin_panel/admin_login_screen.dart';
 
 class AdminTeacherSelectorScreen extends StatelessWidget {
@@ -77,7 +79,12 @@ class AdminTeacherSelectorScreen extends StatelessWidget {
                           ],
                         ),
                         onTap: () {
-                          Get.to(() => const LabTeacherSelectionScreen());
+                          final session = Supabase.instance.client.auth.currentSession;
+                          if (session != null) {
+                            Get.off(() => const LabTeacherSelectionScreen());
+                          } else {
+                            Get.off(() => const LoginScreen());
+                          }
                         },
                       ),
                     ],
